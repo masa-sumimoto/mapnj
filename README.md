@@ -85,4 +85,4 @@ For detailed API documentation, please visit the [Advanced Usage](https://mapnj.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the LICENSE file in the project root for full license information.
