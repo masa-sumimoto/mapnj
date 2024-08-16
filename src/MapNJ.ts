@@ -287,11 +287,11 @@ class MapNJ {
     const selectorStartsWith = (name: string) => `[${prefix}^="${name}"]`;
 
     return {
-      allArea: this.container.querySelector(selector('="mapnj_allArea"')),
-      title: this.container.querySelector('[data-name="mapnj_title"]'),
-      areas: this.container.querySelectorAll(selectorStartsWith('mapnj_area_')),
+      allArea: this.container.querySelector(selector('="mapnj-allArea"')),
+      title: this.container.querySelector('[data-name="mapnj-title"]'),
+      areas: this.container.querySelectorAll(selectorStartsWith('mapnj-area-')),
       labels: this.container.querySelectorAll(
-        selectorStartsWith('mapnj_label_'),
+        selectorStartsWith('mapnj-label-'),
       ),
       selectors: this.container.querySelectorAll('[data-mapnj="selector"]'),
       resetSelectors: this.container.querySelectorAll(

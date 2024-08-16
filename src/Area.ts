@@ -34,7 +34,7 @@ export default class Area {
 
     if (this.elm) {
       const attribute = this.elm.getAttribute(props.config.attributeType);
-      infoArr = attribute ? attribute.split('_') : [];
+      infoArr = attribute ? attribute.split('-') : [];
     } else {
       throw new Error('not found the Area Element.');
     }

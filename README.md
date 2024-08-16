@@ -2,9 +2,7 @@
 
 ![MapNJ Screenshot](https://mapnj.masa-sumimoto.com/public/readme-hero.png)
 
-日本語の解説サイトは[こちら](https://mapnj.masa-sumimoto.com/)。
-
-↑I will eventually translate the explanatory site into English.
+[Official Web Site](https://mapnj.masa-sumimoto.com/)
 
 A script to add interactivity to SVG-based illustration maps
 
@@ -61,12 +59,12 @@ For more details, please refer to the [Design Source Setup](https://mapnj.masa-s
     </defs>
 
     <!-- mapping to basic nodes -->
-    <path id="mapnj_area_xxx" d="" />
-    <path id="mapnj_label_xxx" d="" />
+    <path id="mapnj-area-xxx" d="" />
+    <path id="mapnj-label-xxx" d="" />
 
     <!-- mapping to group nodes -->
-    <g id="mapnj_area_xxx"><path d="" /><path d="" /></g>
-    <g id="mapnj_label_xxx"><path d="" /><path d="" /></g>
+    <g id="mapnj-area-xxx"><path d="" /><path d="" /></g>
+    <g id="mapnj-label-xxx"><path d="" /><path d="" /></g>
   <svg>
 </div>
 ```
@@ -86,3 +84,15 @@ For detailed API documentation, please visit the [Advanced Usage](https://mapnj.
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file in the project root for full license information.
+
+# Changelog
+
+## [0.2.0] - 2024-08-16
+
+### Changed
+
+- Use `-` instead of `_` in mapnj part naming conventions
+
+## [0.1.0] - 2024-07-25
+
+- 初回リリース
