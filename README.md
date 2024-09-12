@@ -14,6 +14,31 @@ A script to add interactivity to SVG-based illustration maps
 
 Check out the [demo](https://mapnj.masa-sumimoto.com/demo-nexus-of-r/) to see it in action.
 
+# Super simple demo
+
+Paste the following into an html file and check it in your browser.
+Your SVG elements will manage the state.
+
+```html
+<div id="your-mapnj">
+  <svg
+    width="600"
+    height="400"
+    viewBox="0 0 600 400"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle id="mapnj-area-blue" cx="204" cy="200" r="40" fill="blue" />
+    <circle id="mapnj-area-yellow" cx="300" cy="200" r="40" fill="yellow" />
+    <circle id="mapnj-area-red" cx="396" cy="200" r="40" fill="red" />
+  </svg>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mapnj@latest/dist/MapNJ.min.js"></script>
+<script>
+  const mapnj = new MapNJ('#your-mapnj');
+</script>
+```
+
 # Usage
 
 ## Installation
