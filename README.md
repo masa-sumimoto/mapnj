@@ -31,13 +31,7 @@ $ npm install mapnj
 You can also include MapNJ directly in your HTML file using a CDN. Add the following script tag to your HTML:
 
 ```
-<script src="https://cdn.jsdelivr.net/npm/mapnj@0.1/dist/MapNJ.min.js"></script>
-```
-
-This will always load the latest version of 0.1.x. If you want to lock it down to a specific version, you can do:
-
-```
-<script src="https://cdn.jsdelivr.net/npm/mapnj@0.1.0/dist/MapNJ.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mapnj@latest/dist/MapNJ.min.js"></script>
 ```
 
 ### Direct Script Usage
@@ -95,4 +89,6 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 ## [0.1.0] - 2024-07-25
 
-- 初回リリース
+### Added
+
+- Initial Release
