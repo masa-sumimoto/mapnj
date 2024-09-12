@@ -367,10 +367,6 @@ class MapNJ {
       console.warn(`Event "${actionName}" is not supported.`);
     }
   }
-
-  // event(eventName: string, callback: Function) {
-
-  // }
 }
 
 // グローバルスコープに追加
