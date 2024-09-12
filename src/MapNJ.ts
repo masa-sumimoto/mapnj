@@ -233,8 +233,8 @@ class MapNJ {
         new ResetSelector({
           props: {
             elm: elm as HTMLElement,
-            state: this.state,
             config: this.config,
+            getState: this.getState,
             setState: this.setState.bind(this),
           },
         }),
@@ -344,12 +344,15 @@ class MapNJ {
     this.state = { ...this.initialState };
   }
 
+  private getState = (): MapNJState => {
+    return this.state;
+  };
+
   private setState(newState: Partial<MapNJState>, actions?: string[]): void {
     this.state = { ...this.state, ...newState };
     this.areas.forEach((node) => node.updateState(this.state));
     this.labels?.forEach((node) => node.updateState(this.state));
     this.selectors?.forEach((node) => node.updateState(this.state));
-    this.resetSelectors?.forEach((node) => node.updateState(this.state));
     this.contents?.forEach((node) => node.updateState(this.state));
     this.bg?.updateState(this.state);
 
