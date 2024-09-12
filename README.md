@@ -106,6 +106,17 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 # Changelog
 
+## [0.2.1] - 2024-09-xx Currently in development!
+
+### Documentation
+
+- Add Super simple demo in README.
+
+### Refactored
+
+- Adjusting how main class methods are defined.
+- Streamlined State Management.
+
 ## [0.2.0] - 2024-08-16
 
 ### Changed
