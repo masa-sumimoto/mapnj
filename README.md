@@ -12,7 +12,7 @@ A script to add interactivity to SVG-based illustration maps
 - Customizes SVG illustration fill and line colors based on context
 - Allows for the addition of related parts involved in operations
 
-Check out the [demo](https://mapnj.masa-sumimoto.com/demo-nexsus-of-r/) to see it in action.
+Check out the [demo](https://mapnj.masa-sumimoto.com/demo-nexus-of-r/) to see it in action.
 
 # Usage
 
