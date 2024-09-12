@@ -175,7 +175,7 @@ class MapNJ {
           elm: elm as SVGElement | HTMLElement,
           config: this.config,
           getState: this.getState,
-          setState: this.setState.bind(this),
+          setState: this.setState,
         },
       });
       this.areas.push(area);
@@ -198,7 +198,7 @@ class MapNJ {
           elm: elm as SVGElement | HTMLElement,
           config: this.config,
           getState: this.getState,
-          setState: this.setState.bind(this),
+          setState: this.setState,
         },
       });
       this.labels.push(label);
@@ -222,7 +222,7 @@ class MapNJ {
             elm: elm as HTMLElement,
             config: this.config,
             getState: this.getState,
-            setState: this.setState.bind(this),
+            setState: this.setState,
           },
         }),
       );
@@ -235,7 +235,7 @@ class MapNJ {
             elm: elm as HTMLElement,
             config: this.config,
             getState: this.getState,
-            setState: this.setState.bind(this),
+            setState: this.setState,
           },
         }),
       );
@@ -348,10 +348,13 @@ class MapNJ {
     return this.state;
   };
 
-  private setState(newState: Partial<MapNJState>, actions?: string[]): void {
+  private setState = (
+    newState: Partial<MapNJState>,
+    actions?: string[],
+  ): void => {
     this.state = { ...this.state, ...newState };
     this.render(actions);
-  }
+  };
 
   on(actionName: string, callback: EventCallback): void {
     if (this.observers[actionName]) {
