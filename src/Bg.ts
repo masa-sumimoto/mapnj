@@ -1,18 +1,16 @@
 import { MapNJState, MapNJConfig } from './types';
 
 interface BgProps {
-  state: MapNJState;
   config: MapNJConfig;
+  getState: () => MapNJState;
 }
 
 export default class Bg {
   private props: BgProps;
-  private crState: MapNJState;
   public elm: HTMLElement;
 
   constructor({ props }: { props: BgProps }) {
     this.props = props;
-    this.crState = props.state;
 
     // wraper tag
     this.elm = document.createElement('div');
@@ -60,13 +58,14 @@ export default class Bg {
   }
 
   render() {
+    const state = this.props.getState();
     const existingPic = this.elm.querySelector(
       '[data-id].--active',
     ) as HTMLElement;
 
-    const newPic = this.crState.activeAreaId
+    const newPic = state.activeAreaId
       ? (this.elm.querySelector(
-          `[data-id='${this.crState.activeAreaId}']`,
+          `[data-id='${state.activeAreaId}']`,
         ) as HTMLElement)
       : (this.elm.querySelector('[data-id="noSelection"]') as HTMLElement);
 
@@ -79,11 +78,5 @@ export default class Bg {
       newPic.classList.add('--active');
       newPic.style.opacity = '1';
     }
-  }
-
-  // common
-  //
-  public updateState(newState: MapNJState): void {
-    this.crState = newState;
   }
 }

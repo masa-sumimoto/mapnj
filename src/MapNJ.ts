@@ -173,8 +173,8 @@ class MapNJ {
       const area = new Area({
         props: {
           elm: elm as SVGElement | HTMLElement,
-          state: this.state,
           config: this.config,
+          getState: this.getState,
           setState: this.setState.bind(this),
         },
       });
@@ -196,8 +196,8 @@ class MapNJ {
       const label = new Label({
         props: {
           elm: elm as SVGElement | HTMLElement,
-          state: this.state,
           config: this.config,
+          getState: this.getState,
           setState: this.setState.bind(this),
         },
       });
@@ -220,8 +220,8 @@ class MapNJ {
         new Selector({
           props: {
             elm: elm as HTMLElement,
-            state: this.state,
             config: this.config,
+            getState: this.getState,
             setState: this.setState.bind(this),
           },
         }),
@@ -245,8 +245,8 @@ class MapNJ {
       const content = new Content({
         props: {
           elm: elm as HTMLElement,
-          state: this.state,
           config: this.config,
+          getState: this.getState,
         },
       });
       this.contents.push(content);
@@ -260,8 +260,8 @@ class MapNJ {
     if (this.config.bgDefaultImage || this.config.bgImages) {
       this.bg = new Bg({
         props: {
-          state: this.state,
           config: this.config,
+          getState: this.getState,
         },
       });
       this.observers.INIT.push(this.bg);
@@ -350,12 +350,6 @@ class MapNJ {
 
   private setState(newState: Partial<MapNJState>, actions?: string[]): void {
     this.state = { ...this.state, ...newState };
-    this.areas.forEach((node) => node.updateState(this.state));
-    this.labels?.forEach((node) => node.updateState(this.state));
-    this.selectors?.forEach((node) => node.updateState(this.state));
-    this.contents?.forEach((node) => node.updateState(this.state));
-    this.bg?.updateState(this.state);
-
     this.render(actions);
   }
 
