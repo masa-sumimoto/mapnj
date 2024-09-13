@@ -106,7 +106,7 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 # Changelog
 
-## [0.2.1] - 2024-09-xx Currently in development!
+## [0.2.1] - 2024-09-13
 
 ### Documentation
 
@@ -116,6 +116,10 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 - Adjusting how main class methods are defined.
 - Streamlined State Management.
+
+### Test
+
+- Add ResetSelector test file.
 
 ## [0.2.0] - 2024-08-16
 
