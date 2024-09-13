@@ -2,14 +2,13 @@ import { MapNJState, MapNJConfig, SetState } from './types';
 
 interface SelectorProps {
   elm: HTMLElement;
-  state: MapNJState;
   config: MapNJConfig;
+  getState: () => MapNJState;
   setState: SetState;
 }
 
 export default class AreaSelector {
   private props: SelectorProps;
-  private crState: MapNJState;
   public areaId: string;
   private elm: SVGElement | HTMLElement;
   private clickHandler: (event: MouseEvent) => void;
@@ -19,7 +18,6 @@ export default class AreaSelector {
   constructor({ props }: { props: SelectorProps }) {
     this.elm = props.elm;
     this.props = props;
-    this.crState = props.state;
     this.areaId = this.elm.dataset.areaId || '';
 
     // event
@@ -43,13 +41,14 @@ export default class AreaSelector {
   private handleClick(e: Event): void {
     e.preventDefault();
     const mouseEvent = e as MouseEvent;
+    const state = this.props.getState();
 
-    const isSelectSameArea = this.areaId === this.crState.activeAreaId;
+    const isSelectSameArea = this.areaId === state.activeAreaId;
 
     if (isSelectSameArea) {
       this.props.setState({}, ['SELECTOR_CLICK']);
     } else {
-      const prevId = this.crState.activeAreaId;
+      const prevId = state.activeAreaId;
       this.props.setState(
         { activeAreaId: this.areaId, prevActiveAreaId: prevId },
         ['SELECTOR_CLICK', 'AREA_CHANGE'],
@@ -69,10 +68,6 @@ export default class AreaSelector {
 
   // common
   //
-  public updateState(newState: MapNJState): void {
-    this.crState = newState;
-  }
-
   public destroy(): void {
     this.elm.removeEventListener('click', this.clickHandler as EventListener);
     this.elm.removeEventListener(

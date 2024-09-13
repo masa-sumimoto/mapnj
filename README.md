@@ -12,7 +12,32 @@ A script to add interactivity to SVG-based illustration maps
 - Customizes SVG illustration fill and line colors based on context
 - Allows for the addition of related parts involved in operations
 
-Check out the [demo](https://mapnj.masa-sumimoto.com/demo-nexsus-of-r/) to see it in action.
+Check out the [demo](https://mapnj.masa-sumimoto.com/demo-nexus-of-r/) to see it in action.
+
+# Super simple demo
+
+Paste the following into an html file and check it in your browser.
+Your SVG elements will manage the state.
+
+```html
+<div id="your-mapnj">
+  <svg
+    width="600"
+    height="400"
+    viewBox="0 0 600 400"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle id="mapnj-area-blue" cx="204" cy="200" r="40" fill="blue" />
+    <circle id="mapnj-area-yellow" cx="300" cy="200" r="40" fill="yellow" />
+    <circle id="mapnj-area-red" cx="396" cy="200" r="40" fill="red" />
+  </svg>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mapnj@latest/dist/MapNJ.min.js"></script>
+<script>
+  const mapnj = new MapNJ('#your-mapnj');
+</script>
+```
 
 # Usage
 
@@ -31,13 +56,7 @@ $ npm install mapnj
 You can also include MapNJ directly in your HTML file using a CDN. Add the following script tag to your HTML:
 
 ```
-<script src="https://cdn.jsdelivr.net/npm/mapnj@0.1/dist/MapNJ.min.js"></script>
-```
-
-This will always load the latest version of 0.1.x. If you want to lock it down to a specific version, you can do:
-
-```
-<script src="https://cdn.jsdelivr.net/npm/mapnj@0.1.0/dist/MapNJ.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mapnj@latest/dist/MapNJ.min.js"></script>
 ```
 
 ### Direct Script Usage
@@ -87,6 +106,21 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 # Changelog
 
+## [0.2.1] - 2024-09-13
+
+### Documentation
+
+- Add Super simple demo in README.
+
+### Refactored
+
+- Adjusting how main class methods are defined.
+- Streamlined State Management.
+
+### Test
+
+- Add ResetSelector test file.
+
 ## [0.2.0] - 2024-08-16
 
 ### Changed
@@ -95,4 +129,6 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 ## [0.1.0] - 2024-07-25
 
-- 初回リリース
+### Added
+
+- Initial Release

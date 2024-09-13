@@ -4,9 +4,9 @@ import { MapNJState, MapNJConfig, SetState } from './types';
 
 interface AreaProps {
   elm: SVGElement | HTMLElement;
-  state: MapNJState;
   config: MapNJConfig;
   setState: SetState;
+  getState: () => MapNJState;
 }
 
 interface TargetElmsInfo {
@@ -17,7 +17,6 @@ interface TargetElmsInfo {
 
 export default class Area {
   private props: AreaProps;
-  private crState: MapNJState;
   public id: string;
   private elm: SVGElement | HTMLElement;
   private targetElmsInfo: TargetElmsInfo[];
@@ -27,7 +26,6 @@ export default class Area {
 
   constructor({ props }: { props: AreaProps }) {
     this.props = props;
-    this.crState = props.state;
     this.elm = props.elm;
 
     let infoArr;
@@ -149,9 +147,9 @@ export default class Area {
   }
 
   public render(): void {
+    const state = this.props.getState();
     const isActiveView =
-      this.id === this.crState.activeAreaId ||
-      this.id === this.crState.hoverAreaId;
+      this.id === state.activeAreaId || this.id === state.hoverAreaId;
 
     isActiveView ? this.activeView() : this.defaultView();
   }
@@ -161,12 +159,13 @@ export default class Area {
   private handleClick(e: Event): void {
     e.preventDefault();
     const mouseEvent = e as MouseEvent;
-    const isClickSameArea = this.id === this.crState.activeAreaId;
+    const state = this.props.getState();
+    const isClickSameArea = this.id === state.activeAreaId;
 
     if (isClickSameArea) {
       this.props.setState({}, ['AREA_CLICK']);
     } else {
-      const prevId = this.crState.activeAreaId;
+      const prevId = state.activeAreaId;
       this.props.setState({ activeAreaId: this.id, prevActiveAreaId: prevId }, [
         'AREA_CLICK',
         'AREA_CHANGE',
@@ -186,10 +185,6 @@ export default class Area {
 
   // common
   //
-  public updateState(newState: MapNJState): void {
-    this.crState = newState;
-  }
-
   public destroy(): void {
     this.elm.removeEventListener('click', this.clickHandler as EventListener);
     this.elm.removeEventListener(

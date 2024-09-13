@@ -173,9 +173,9 @@ class MapNJ {
       const area = new Area({
         props: {
           elm: elm as SVGElement | HTMLElement,
-          state: this.state,
           config: this.config,
-          setState: this.setState.bind(this),
+          getState: this.getState,
+          setState: this.setState,
         },
       });
       this.areas.push(area);
@@ -196,9 +196,9 @@ class MapNJ {
       const label = new Label({
         props: {
           elm: elm as SVGElement | HTMLElement,
-          state: this.state,
           config: this.config,
-          setState: this.setState.bind(this),
+          getState: this.getState,
+          setState: this.setState,
         },
       });
       this.labels.push(label);
@@ -220,9 +220,9 @@ class MapNJ {
         new Selector({
           props: {
             elm: elm as HTMLElement,
-            state: this.state,
             config: this.config,
-            setState: this.setState.bind(this),
+            getState: this.getState,
+            setState: this.setState,
           },
         }),
       );
@@ -233,9 +233,9 @@ class MapNJ {
         new ResetSelector({
           props: {
             elm: elm as HTMLElement,
-            state: this.state,
             config: this.config,
-            setState: this.setState.bind(this),
+            getState: this.getState,
+            setState: this.setState,
           },
         }),
       );
@@ -245,8 +245,8 @@ class MapNJ {
       const content = new Content({
         props: {
           elm: elm as HTMLElement,
-          state: this.state,
           config: this.config,
+          getState: this.getState,
         },
       });
       this.contents.push(content);
@@ -260,8 +260,8 @@ class MapNJ {
     if (this.config.bgDefaultImage || this.config.bgImages) {
       this.bg = new Bg({
         props: {
-          state: this.state,
           config: this.config,
+          getState: this.getState,
         },
       });
       this.observers.INIT.push(this.bg);
@@ -344,17 +344,17 @@ class MapNJ {
     this.state = { ...this.initialState };
   }
 
-  private setState(newState: Partial<MapNJState>, actions?: string[]): void {
-    this.state = { ...this.state, ...newState };
-    this.areas.forEach((node) => node.updateState(this.state));
-    this.labels?.forEach((node) => node.updateState(this.state));
-    this.selectors?.forEach((node) => node.updateState(this.state));
-    this.resetSelectors?.forEach((node) => node.updateState(this.state));
-    this.contents?.forEach((node) => node.updateState(this.state));
-    this.bg?.updateState(this.state);
+  private getState = (): MapNJState => {
+    return this.state;
+  };
 
+  private setState = (
+    newState: Partial<MapNJState>,
+    actions?: string[],
+  ): void => {
+    this.state = { ...this.state, ...newState };
     this.render(actions);
-  }
+  };
 
   on(actionName: string, callback: EventCallback): void {
     if (this.observers[actionName]) {
@@ -367,10 +367,6 @@ class MapNJ {
       console.warn(`Event "${actionName}" is not supported.`);
     }
   }
-
-  // event(eventName: string, callback: Function) {
-
-  // }
 }
 
 // グローバルスコープに追加

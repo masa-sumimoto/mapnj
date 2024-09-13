@@ -2,14 +2,13 @@ import { MapNJState, MapNJConfig } from './types';
 
 interface ContentProps {
   elm: HTMLElement;
-  state: MapNJState;
   config: MapNJConfig;
+  getState: () => MapNJState;
 }
 
 export default class Content {
   private props: ContentProps;
   private elm: HTMLElement;
-  private crState: MapNJState;
   private areaId: string;
   private transitionSpeed: number;
   private displayStyle: string;
@@ -17,7 +16,6 @@ export default class Content {
   constructor({ props }: { props: ContentProps }) {
     this.props = props;
     this.elm = props.elm;
-    this.crState = this.props.state;
     this.transitionSpeed = props.config.contentChangeSpeed;
     this.displayStyle = window.getComputedStyle(this.elm).display;
     this.areaId = this.elm.dataset.areaId || '';
@@ -43,16 +41,10 @@ export default class Content {
   }
 
   render() {
-    if (this.crState.activeAreaId === this.areaId) {
+    if (this.props.getState().activeAreaId === this.areaId) {
       this.show();
     } else {
       this.hide();
     }
-  }
-
-  // common
-  //
-  public updateState(newState: MapNJState): void {
-    this.crState = newState;
   }
 }

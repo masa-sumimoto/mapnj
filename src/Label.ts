@@ -4,8 +4,8 @@ import { MapNJState, MapNJConfig, SetState } from './types';
 
 interface LabelProps {
   elm: SVGElement | HTMLElement;
-  state: MapNJState;
   config: MapNJConfig;
+  getState: () => MapNJState;
   setState: SetState;
 }
 
@@ -17,7 +17,6 @@ interface TargetElmsInfo {
 
 export default class Label {
   private props: LabelProps;
-  private crState: MapNJState;
   private areaId: string;
   private elm: SVGElement | HTMLElement;
   private targetElmsInfo: TargetElmsInfo[];
@@ -28,7 +27,6 @@ export default class Label {
   constructor({ props }: { props: LabelProps }) {
     this.elm = props.elm;
     this.props = props;
-    this.crState = props.state;
 
     let infoArr;
 
@@ -182,9 +180,9 @@ export default class Label {
   }
 
   public render(): void {
+    const state = this.props.getState();
     const isActive =
-      this.areaId === this.crState.activeAreaId ||
-      this.areaId === this.crState.hoverAreaId;
+      this.areaId === state.activeAreaId || this.areaId === state.hoverAreaId;
 
     if (isActive) {
       this.activeView();
@@ -199,12 +197,13 @@ export default class Label {
     e.preventDefault();
     const mouseEvent = e as MouseEvent;
 
-    const isSelectSameArea = this.areaId === this.crState.activeAreaId;
+    const state = this.props.getState();
+    const isSelectSameArea = this.areaId === state.activeAreaId;
 
     if (isSelectSameArea) {
       this.props.setState({}, ['LABEL_CLICK']);
     } else {
-      const prevId = this.crState.activeAreaId;
+      const prevId = state.activeAreaId;
       this.props.setState(
         { activeAreaId: this.areaId, prevActiveAreaId: prevId },
         ['LABEL_CLICK', 'AREA_CHANGE'],
@@ -224,10 +223,6 @@ export default class Label {
 
   // common
   //
-  public updateState(newState: MapNJState): void {
-    this.crState = newState;
-  }
-
   public destroy(): void {
     if (!this.props.config.noEventLabels.includes(this.areaId)) {
       this.elm.removeEventListener(
