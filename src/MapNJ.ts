@@ -40,6 +40,8 @@ class MapNJ {
       // config
       attributeType,
 
+      transparentDefaultAreas,
+
       areaDefaultFillColor,
       areaDefaultFillColors,
       areaDefaultStrokeColor,
@@ -96,6 +98,7 @@ class MapNJ {
     this.config = {
       attributeType: attributeType || 'id',
 
+      transparentDefaultAreas: transparentDefaultAreas ?? false,
       areaDefaultFillColor: areaDefaultFillColor || '#eee',
       areaDefaultFillColors: areaDefaultFillColors || {},
       areaDefaultStrokeColor: areaDefaultStrokeColor || '#fff',

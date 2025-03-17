@@ -111,6 +111,14 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 # Changelog
 
+## [0.3.0] - 2025-xx-xx
+
+### Added
+
+- Add transparentDefaultAreas Option
+- Add transparentDefaultLabels Option 
+
+
 ## [0.2.1] - 2024-09-13
 
 ### Documentation

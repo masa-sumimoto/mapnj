@@ -10,6 +10,7 @@ export function getDummyConfig(): MapNJConfig {
     labelActiveStrokeColor: '#000000',
     labelDefaultFillColor: '#FFFFFF',
     labelDefaultStrokeColor: '#FFFFFF',
+    transparentDefaultAreas: false,
     areaDefaultFillColor: '#eee',
     areaDefaultFillColors: {},
     areaDefaultStrokeColor: '#fff',

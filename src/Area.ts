@@ -139,7 +139,16 @@ export default class Area {
       ? indivisualStrokeColor
       : commonStrokeColor;
 
+    const isTranceparent = this.props.config.transparentDefaultAreas;
+
     this.targetElmsInfo.forEach((info) => {
+      // 透明オプションが指定されている場合は優先的に透明にする
+      if (isTranceparent) {
+        (info.elm as HTMLElement).style.fill = 'transparent';
+        (info.elm as HTMLElement).style.stroke = 'transparent';
+        return;
+      }
+
       if (info.hasFill) (info.elm as HTMLElement).style.fill = customFillColor;
       if (info.hasStroke)
         (info.elm as HTMLElement).style.stroke = customStrokeColor;

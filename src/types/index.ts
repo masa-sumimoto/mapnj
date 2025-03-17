@@ -62,6 +62,7 @@ export interface MapNJOpts {
   // for config
   attributeType?: MapTargetAttributeType;
 
+  transparentDefaultAreas?: boolean;
   areaDefaultFillColor?: MonoColor;
   areaDefaultFillColors?: IndivisualColors;
   areaDefaultStrokeColor?: MonoColor;
@@ -101,6 +102,7 @@ export interface MapNJOpts {
 export interface MapNJConfig {
   attributeType: MapTargetAttributeType;
 
+  transparentDefaultAreas: boolean;
   areaDefaultFillColor: MonoColor;
   areaDefaultFillColors: IndivisualColors;
   areaDefaultStrokeColor: MonoColor;
