@@ -41,6 +41,7 @@ class MapNJ {
       attributeType,
 
       transparentDefaultAreas,
+      transparentDefaultLabels,
 
       areaDefaultFillColor,
       areaDefaultFillColors,
@@ -99,6 +100,8 @@ class MapNJ {
       attributeType: attributeType || 'id',
 
       transparentDefaultAreas: transparentDefaultAreas ?? false,
+      transparentDefaultLabels: transparentDefaultLabels ?? false,
+
       areaDefaultFillColor: areaDefaultFillColor || '#eee',
       areaDefaultFillColors: areaDefaultFillColors || {},
       areaDefaultStrokeColor: areaDefaultStrokeColor || '#fff',

@@ -151,6 +151,7 @@ export default class Label {
       if (info.hasFill && customFillColor) {
         (info.elm as HTMLElement).style.fill = customFillColor;
       }
+
       if (info.hasStroke && customStrokeColor)
         (info.elm as HTMLElement).style.stroke = customStrokeColor;
     });
@@ -172,7 +173,16 @@ export default class Label {
       ? indivisualStrokeColor
       : commonStrokeColor;
 
+    const isTranceparent = this.props.config.transparentDefaultLabels;
+
     this.targetElmsInfo.forEach((info) => {
+      // 透明オプションが指定されている場合は優先的に透明にする
+      if (isTranceparent) {
+        (info.elm as HTMLElement).style.fill = 'transparent';
+        (info.elm as HTMLElement).style.stroke = 'transparent';
+        return;
+      }
+
       if (info.hasFill) (info.elm as HTMLElement).style.fill = customFillColor;
       if (info.hasStroke)
         (info.elm as HTMLElement).style.stroke = customStrokeColor;

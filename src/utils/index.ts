@@ -11,6 +11,7 @@ export function getDummyConfig(): MapNJConfig {
     labelDefaultFillColor: '#FFFFFF',
     labelDefaultStrokeColor: '#FFFFFF',
     transparentDefaultAreas: false,
+    transparentDefaultLabels: false,
     areaDefaultFillColor: '#eee',
     areaDefaultFillColors: {},
     areaDefaultStrokeColor: '#fff',
