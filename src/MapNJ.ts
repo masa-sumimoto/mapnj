@@ -39,6 +39,10 @@ class MapNJ {
     const {
       // config
       attributeType,
+      attributeValueSeparator,
+
+      transparentDefaultAreas,
+      transparentDefaultLabels,
 
       areaDefaultFillColor,
       areaDefaultFillColors,
@@ -93,8 +97,17 @@ class MapNJ {
 
     // info
     //
+
+    const _attributeType = attributeType || 'id';
+    const _attributeValueSeparator = attributeValueSeparator || '-';
+    const _dom = this.initDom(_attributeType, _attributeValueSeparator);
+
     this.config = {
-      attributeType: attributeType || 'id',
+      attributeType: _attributeType,
+      attributeValueSeparator: _attributeValueSeparator,
+
+      transparentDefaultAreas: transparentDefaultAreas ?? false,
+      transparentDefaultLabels: transparentDefaultLabels ?? false,
 
       areaDefaultFillColor: areaDefaultFillColor || '#eee',
       areaDefaultFillColors: areaDefaultFillColors || {},
@@ -125,7 +138,7 @@ class MapNJ {
       bgDefaultImage: bgDefaultImage || undefined,
       bgBrightness: bgBrightness || 100,
       bgChangeSpeed: bgChangeSpeed || 0.5,
-      dom: this.initDom(attributeType || 'id'),
+      dom: _dom,
     };
 
     // [todo] optionで受け取った値が全て有効かどうかの検証
@@ -281,18 +294,19 @@ class MapNJ {
     this.setState({}, ['INIT']);
   }
 
-  private initDom(attributeType: string): DomElements {
+  private initDom(attributeType: string, separator: string): DomElements {
     const prefix = attributeType === 'data-name' ? 'data-name' : 'id';
     const selector = (name: string) => `[${prefix}${name}]`;
     const selectorStartsWith = (name: string) => `[${prefix}^="${name}"]`;
 
+    const areaPrefix = `mapnj${separator}area${separator}`;
+    const labelPrefix = `mapnj${separator}label${separator}`;
+
     return {
       allArea: this.container.querySelector(selector('="mapnj-allArea"')),
       title: this.container.querySelector('[data-name="mapnj-title"]'),
-      areas: this.container.querySelectorAll(selectorStartsWith('mapnj-area-')),
-      labels: this.container.querySelectorAll(
-        selectorStartsWith('mapnj-label-'),
-      ),
+      areas: this.container.querySelectorAll(selectorStartsWith(areaPrefix)),
+      labels: this.container.querySelectorAll(selectorStartsWith(labelPrefix)),
       selectors: this.container.querySelectorAll('[data-mapnj="selector"]'),
       resetSelectors: this.container.querySelectorAll(
         '[data-mapnj="reset-selector"]',

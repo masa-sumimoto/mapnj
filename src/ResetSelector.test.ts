@@ -1,5 +1,8 @@
 import ResetSelector from './ResetSelector';
 import { MapNJState, MapNJConfig } from './types';
+import { getDummyConfig } from './utils/index';
+
+const defaultConfig: MapNJConfig = getDummyConfig();
 
 describe('ResetSelector', () => {
   let resetSelector: ResetSelector;
@@ -10,14 +13,20 @@ describe('ResetSelector', () => {
   let mockSetState: jest.Mock;
 
   beforeEach(() => {
-    // Mock Settings
     mockElm = document.createElement('button');
     mockState = { activeAreaId: '', prevActiveAreaId: '', hoverAreaId: '' };
-    mockConfig = {} as MapNJConfig;
+    mockConfig = defaultConfig;
     mockGetState = jest.fn(() => mockState);
     mockSetState = jest.fn();
+  });
 
-    // ResetSelectorのインスタンス作成
+  afterEach(() => {
+    resetSelector.destroy();
+    jest.clearAllMocks();
+  });
+
+  test('1. should add click event listener on construction', () => {
+    const spy = jest.spyOn(mockElm, 'addEventListener');
     resetSelector = new ResetSelector({
       props: {
         elm: mockElm,
@@ -26,17 +35,11 @@ describe('ResetSelector', () => {
         setState: mockSetState,
       },
     });
+    expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
   });
 
-  afterEach(() => {
-    resetSelector.destroy();
-    jest.clearAllMocks();
-  });
-
-  // 1. コンストラクタの実行確認
-  test('should add click event listener on construction', () => {
-    const spy = jest.spyOn(mockElm, 'addEventListener');
-    new ResetSelector({
+  test('2. should call setState with empty object when activeAreaId is already empty', () => {
+    resetSelector = new ResetSelector({
       props: {
         elm: mockElm,
         config: mockConfig,
@@ -44,27 +47,19 @@ describe('ResetSelector', () => {
         setState: mockSetState,
       },
     });
-
-    expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
-  });
-
-  // 2. activeAreaIdが空の場合のhandleClickの動作
-  test('should call setState with empty object when activeAreaId is already empty', () => {
     mockElm.click();
     expect(mockSetState).toHaveBeenCalledWith({}, ['RESET_SELECTOR_CLICK']);
   });
 
   // 3. activeAreaIdが空でない場合のhandleClickの動作
-  test('should call setState with new state when activeAreaId is not empty', () => {
-    const initialActiveAreaId = 'area1';
+  test('3. should call setState with new state when activeAreaId is not empty', () => {
     const mockState = {
-      activeAreaId: initialActiveAreaId,
+      activeAreaId: 'neoim',
       prevActiveAreaId: '',
       hoverAreaId: '',
     };
     const mockGetState = jest.fn(() => mockState);
     const mockSetState = jest.fn();
-
     resetSelector = new ResetSelector({
       props: {
         elm: mockElm,
@@ -78,16 +73,23 @@ describe('ResetSelector', () => {
     expect(mockSetState).toHaveBeenCalledWith(
       {
         activeAreaId: '',
-        prevActiveAreaId: initialActiveAreaId,
+        prevActiveAreaId: 'neoim',
       },
       ['RESET_SELECTOR_CLICK', 'AREA_CHANGE'],
     );
   });
 
-  // 4. destroyメソッドがイベントリスナーを正しく削除するか
-  test('should remove event listener when destroy is called', () => {
+  test('4. should remove event listener when destroy is called', () => {
     const spy = jest.spyOn(mockElm, 'removeEventListener');
-    resetSelector.destroy();
+    resetSelector = new ResetSelector({
+      props: {
+        elm: mockElm,
+        config: mockConfig,
+        getState: mockGetState,
+        setState: mockSetState,
+      },
+    });
+    if (resetSelector) resetSelector.destroy();
     expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
   });
 });

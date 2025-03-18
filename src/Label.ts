@@ -32,7 +32,9 @@ export default class Label {
 
     if (this.elm) {
       const attribute = this.elm.getAttribute(props.config.attributeType);
-      infoArr = attribute ? attribute.split('-') : [];
+      infoArr = attribute
+        ? attribute.split(props.config.attributeValueSeparator)
+        : [];
     } else {
       throw new Error('not found the Area Label Element.');
     }
@@ -151,6 +153,7 @@ export default class Label {
       if (info.hasFill && customFillColor) {
         (info.elm as HTMLElement).style.fill = customFillColor;
       }
+
       if (info.hasStroke && customStrokeColor)
         (info.elm as HTMLElement).style.stroke = customStrokeColor;
     });
@@ -172,7 +175,16 @@ export default class Label {
       ? indivisualStrokeColor
       : commonStrokeColor;
 
+    const isTranceparent = this.props.config.transparentDefaultLabels;
+
     this.targetElmsInfo.forEach((info) => {
+      // 透明オプションが指定されている場合は優先的に透明にする
+      if (isTranceparent) {
+        (info.elm as HTMLElement).style.fill = 'transparent';
+        (info.elm as HTMLElement).style.stroke = 'transparent';
+        return;
+      }
+
       if (info.hasFill) (info.elm as HTMLElement).style.fill = customFillColor;
       if (info.hasStroke)
         (info.elm as HTMLElement).style.stroke = customStrokeColor;
