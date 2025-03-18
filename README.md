@@ -111,13 +111,13 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 
 # Changelog
 
-## [0.3.0] - 2025-xx-xx
+## [0.3.0] - 2025-03-18
 
 ### Added
 
 - Add transparentDefaultAreas Option
 - Add transparentDefaultLabels Option 
-
+- Add attributeValueSeparator Option
 
 ## [0.2.1] - 2024-09-13
 

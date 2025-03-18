@@ -32,7 +32,9 @@ export default class Label {
 
     if (this.elm) {
       const attribute = this.elm.getAttribute(props.config.attributeType);
-      infoArr = attribute ? attribute.split('-') : [];
+      infoArr = attribute
+        ? attribute.split(props.config.attributeValueSeparator)
+        : [];
     } else {
       throw new Error('not found the Area Label Element.');
     }

@@ -1,4 +1,5 @@
 export type MapTargetAttributeType = 'id' | 'data-name';
+export type AttributeValueSeparator = '-' | '_';
 
 export type Action =
   | 'INIT'
@@ -61,6 +62,7 @@ export interface DomElements {
 export interface MapNJOpts {
   // for config
   attributeType?: MapTargetAttributeType;
+  attributeValueSeparator?: AttributeValueSeparator;
 
   transparentDefaultAreas?: boolean;
   transparentDefaultLabels?: boolean;
@@ -103,6 +105,7 @@ export interface MapNJOpts {
 
 export interface MapNJConfig {
   attributeType: MapTargetAttributeType;
+  attributeValueSeparator: AttributeValueSeparator;
 
   transparentDefaultAreas: boolean;
   transparentDefaultLabels: boolean;

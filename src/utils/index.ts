@@ -4,6 +4,7 @@ import { MapNJConfig } from '../types';
 export function getDummyConfig(): MapNJConfig {
   return {
     attributeType: 'data-name',
+    attributeValueSeparator: '-',
     noEventLabels: [],
     labelDispAnim: 'static',
     labelActiveFillColor: '#000000',
