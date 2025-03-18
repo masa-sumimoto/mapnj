@@ -119,6 +119,10 @@ This project is licensed under the MIT License. See the LICENSE file in the proj
 - Add transparentDefaultLabels Option 
 - Add attributeValueSeparator Option
 
+### Test
+
+- Add some tests (for Area, Label) 
+
 ## [0.2.1] - 2024-09-13
 
 ### Documentation
