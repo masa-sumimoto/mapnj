@@ -1,3 +1,4 @@
+import { vi, type Mock } from 'vitest';
 import ResetSelector from './ResetSelector';
 import { MapNJState, MapNJConfig } from './types';
 import { getDummyConfig } from './utils/index';
@@ -9,24 +10,24 @@ describe('ResetSelector', () => {
   let mockElm: HTMLElement;
   let mockState: MapNJState;
   let mockConfig: MapNJConfig;
-  let mockGetState: jest.Mock;
-  let mockSetState: jest.Mock;
+  let mockGetState: Mock;
+  let mockSetState: Mock;
 
   beforeEach(() => {
     mockElm = document.createElement('button');
     mockState = { activeAreaId: '', prevActiveAreaId: '', hoverAreaId: '' };
     mockConfig = defaultConfig;
-    mockGetState = jest.fn(() => mockState);
-    mockSetState = jest.fn();
+    mockGetState = vi.fn(() => mockState);
+    mockSetState = vi.fn();
   });
 
   afterEach(() => {
     resetSelector.destroy();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('1. should add click event listener on construction', () => {
-    const spy = jest.spyOn(mockElm, 'addEventListener');
+    const spy = vi.spyOn(mockElm, 'addEventListener');
     resetSelector = new ResetSelector({
       props: {
         elm: mockElm,
@@ -58,8 +59,8 @@ describe('ResetSelector', () => {
       prevActiveAreaId: '',
       hoverAreaId: '',
     };
-    const mockGetState = jest.fn(() => mockState);
-    const mockSetState = jest.fn();
+    const mockGetState = vi.fn(() => mockState);
+    const mockSetState = vi.fn();
     resetSelector = new ResetSelector({
       props: {
         elm: mockElm,
@@ -80,7 +81,7 @@ describe('ResetSelector', () => {
   });
 
   test('4. should remove event listener when destroy is called', () => {
-    const spy = jest.spyOn(mockElm, 'removeEventListener');
+    const spy = vi.spyOn(mockElm, 'removeEventListener');
     resetSelector = new ResetSelector({
       props: {
         elm: mockElm,

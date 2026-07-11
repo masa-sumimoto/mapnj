@@ -1,4 +1,4 @@
-import { hasStroke, hasFill } from './Utils';
+import { hasStroke, hasFill, prefersReducedMotion } from './Utils';
 
 import { MapNJState, MapNJConfig, SetState } from './types';
 
@@ -20,9 +20,10 @@ export default class Label {
   private areaId: string;
   private elm: SVGElement | HTMLElement;
   private targetElmsInfo: TargetElmsInfo[];
-  private clickHandler?: (event: MouseEvent) => void;
-  private mouseoverHandler?: (event: MouseEvent) => void;
-  private mouseoutHandler?: (event: MouseEvent) => void;
+  private clickHandler?: (event: Event) => void;
+  private keydownHandler?: (event: Event) => void;
+  private pointerEnterHandler?: (event: Event) => void;
+  private pointerLeaveHandler?: (event: Event) => void;
 
   constructor({ props }: { props: LabelProps }) {
     this.elm = props.elm;
@@ -60,21 +61,22 @@ export default class Label {
 
     // event
     // 対象はグループを考慮せず、this.elmに対して割り当てる
+    // hover系は Pointer Events を使う (タッチ端末でのhover残留を防ぐため)
     if (!this.isNoEventLabel()) {
       this.clickHandler = this.handleClick.bind(this);
-      this.mouseoverHandler = this.handleMouseOver.bind(this);
-      this.mouseoutHandler = this.handleMouseOut.bind(this);
+      this.keydownHandler = this.handleKeydown.bind(this);
+      this.pointerEnterHandler = this.handlePointerEnter.bind(this);
+      this.pointerLeaveHandler = this.handlePointerLeave.bind(this);
 
-      this.elm.addEventListener('click', this.clickHandler as EventListener);
-      this.elm.addEventListener(
-        'mouseover',
-        this.mouseoverHandler as EventListener,
-      );
-      this.elm.addEventListener(
-        'mouseout',
-        this.mouseoutHandler as EventListener,
-      );
+      this.elm.addEventListener('click', this.clickHandler);
+      this.elm.addEventListener('keydown', this.keydownHandler);
+      this.elm.addEventListener('pointerenter', this.pointerEnterHandler);
+      this.elm.addEventListener('pointerleave', this.pointerLeaveHandler);
       (this.elm as HTMLElement).style.cursor = 'pointer';
+
+      // a11y: クリック可能なラベルはキーボード操作可能なボタンとして振る舞う
+      this.elm.setAttribute('role', 'button');
+      this.elm.setAttribute('tabindex', '0');
     }
 
     // style
@@ -86,15 +88,22 @@ export default class Label {
   }
 
   private initStyle(): void {
+    const reducedMotion = prefersReducedMotion();
+
     // デフォルトスタイルの設定
-    this.targetElmsInfo.forEach((info) => {
-      (info.elm as HTMLElement).style.transition =
-        'fill 0.2s ease, stroke 0.2s ease';
-    });
+    if (!reducedMotion) {
+      this.targetElmsInfo.forEach((info) => {
+        (info.elm as HTMLElement).style.transition =
+          'fill 0.2s ease, stroke 0.2s ease';
+      });
+    }
 
     if (!this.isNoEventLabel()) {
       (this.elm as HTMLElement).style.cursor = 'pointer';
     }
+
+    // reduced motion 指定時は登場アニメーションを行わない
+    if (reducedMotion) return;
 
     // animation指定のための設定
     const keyframes: { [key: string]: Keyframe[] } = {
@@ -139,7 +148,7 @@ export default class Label {
 
       const commonFillColor = this.props.config.labelActiveFillColor;
       const indivisualFillColor =
-        this.props.config.labelActiveStrokeColors?.[this.areaId];
+        this.props.config.labelActiveFillColors?.[this.areaId];
       const commonStrokeColor = this.props.config.labelActiveStrokeColor;
       const indivisualStrokeColor =
         this.props.config.labelActiveStrokeColors?.[this.areaId];
@@ -196,6 +205,12 @@ export default class Label {
     const isActive =
       this.areaId === state.activeAreaId || this.areaId === state.hoverAreaId;
 
+    // CSSフックとして状態を公開する
+    this.elm.setAttribute(
+      'data-mapnj-state',
+      isActive ? 'active' : 'default',
+    );
+
     if (isActive) {
       this.activeView();
     } else {
@@ -205,10 +220,7 @@ export default class Label {
 
   // event
   //
-  private handleClick(e: Event): void {
-    e.preventDefault();
-    const mouseEvent = e as MouseEvent;
-
+  private select(): void {
     const state = this.props.getState();
     const isSelectSameArea = this.areaId === state.activeAreaId;
 
@@ -223,32 +235,38 @@ export default class Label {
     }
   }
 
-  private handleMouseOver(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handleClick(e: Event): void {
+    e.preventDefault();
+    this.select();
+  }
+
+  private handleKeydown(e: Event): void {
+    const key = (e as KeyboardEvent).key;
+    if (key === 'Enter' || key === ' ') {
+      e.preventDefault();
+      this.select();
+    }
+  }
+
+  private handlePointerEnter(e: Event): void {
+    // タッチにhoverの概念は無い
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: this.areaId }, ['LABEL_MOUSEOVER']);
   }
 
-  private handleMouseOut(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handlePointerLeave(e: Event): void {
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: '' }, ['LABEL_MOUSEOUT']);
   }
 
   // common
   //
   public destroy(): void {
-    if (!this.props.config.noEventLabels.includes(this.areaId)) {
-      this.elm.removeEventListener(
-        'click',
-        this.clickHandler! as EventListener,
-      );
-      this.elm.removeEventListener(
-        'mouseover',
-        this.mouseoverHandler! as EventListener,
-      );
-      this.elm.removeEventListener(
-        'mouseout',
-        this.mouseoutHandler! as EventListener,
-      );
+    if (!this.isNoEventLabel()) {
+      this.elm.removeEventListener('click', this.clickHandler!);
+      this.elm.removeEventListener('keydown', this.keydownHandler!);
+      this.elm.removeEventListener('pointerenter', this.pointerEnterHandler!);
+      this.elm.removeEventListener('pointerleave', this.pointerLeaveHandler!);
     }
   }
 }

@@ -1,3 +1,4 @@
+import { vi, type Mock } from 'vitest';
 import Label from './Label';
 import { MapNJState, MapNJConfig } from './types';
 import { getDummyConfig } from './utils/index';
@@ -9,28 +10,28 @@ describe('Label', () => {
   let mockElm: SVGElement;
   let mockState: MapNJState;
   let mockConfig: MapNJConfig;
-  let mockGetState: jest.Mock;
-  let mockSetState: jest.Mock;
+  let mockGetState: Mock;
+  let mockSetState: Mock;
 
   beforeEach(() => {
     mockElm = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     mockElm.setAttribute('data-name', 'mapnj-label-neoim');
     mockState = { activeAreaId: '', prevActiveAreaId: '', hoverAreaId: '' };
     mockConfig = { ...defaultConfig };
-    mockGetState = jest.fn(() => mockState);
-    mockSetState = jest.fn();
+    mockGetState = vi.fn(() => mockState);
+    mockSetState = vi.fn();
 
     // animateメソッドのモック化
-    Element.prototype.animate = jest.fn();
+    Element.prototype.animate = vi.fn();
   });
 
   afterEach(() => {
     if (label) label.destroy();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('1. 構築時、イベントリスナーが設定されているべき', () => {
-    const spy = jest.spyOn(mockElm, 'addEventListener');
+    const spy = vi.spyOn(mockElm, 'addEventListener');
     label = new Label({
       props: {
         elm: mockElm,
@@ -40,14 +41,15 @@ describe('Label', () => {
       },
     });
     expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
-    expect(spy).toHaveBeenCalledWith('mouseover', expect.any(Function));
-    expect(spy).toHaveBeenCalledWith('mouseout', expect.any(Function));
-    expect(spy).toHaveBeenCalledTimes(3);
+    expect(spy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(spy).toHaveBeenCalledWith('pointerenter', expect.any(Function));
+    expect(spy).toHaveBeenCalledWith('pointerleave', expect.any(Function));
+    expect(spy).toHaveBeenCalledTimes(4);
   });
 
   test('2. should not add event listeners for noEventLabels', () => {
     mockConfig.noEventLabels = ['neoim'];
-    const spy = jest.spyOn(mockElm, 'addEventListener');
+    const spy = vi.spyOn(mockElm, 'addEventListener');
     label = new Label({
       props: {
         elm: mockElm,

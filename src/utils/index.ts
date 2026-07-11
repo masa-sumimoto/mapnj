@@ -1,4 +1,4 @@
-import { MapNJConfig } from '../types';
+import { MapNJConfig, DomElements } from '../types';
 
 // for test
 export function getDummyConfig(): MapNJConfig {
@@ -31,6 +31,6 @@ export function getDummyConfig(): MapNJConfig {
     bgDefaultImage: undefined,
     bgBrightness: 100,
     bgChangeSpeed: 0.5,
-    dom: {} as any, // 実際のDOMオブジェクトの代わりに空のオブジェクトを使用
+    dom: {} as unknown as DomElements, // 実際のDOMオブジェクトの代わりに空のオブジェクトを使用
   };
 }

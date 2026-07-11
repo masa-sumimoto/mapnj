@@ -1,3 +1,4 @@
+import { vi, type Mock } from 'vitest';
 import AreaSelector from './Selector';
 import { MapNJState, MapNJConfig } from './types';
 import { getDummyConfig } from './utils/index';
@@ -9,19 +10,19 @@ describe('Selector', () => {
   let mockElm: HTMLElement;
   let mockState: MapNJState;
   let mockConfig: MapNJConfig;
-  let mockGetState: jest.Mock;
-  let mockSetState: jest.Mock;
+  let mockGetState: Mock;
+  let mockSetState: Mock;
 
   beforeEach(() => {
     mockElm = document.createElement('button');
     mockState = { activeAreaId: '', prevActiveAreaId: '', hoverAreaId: '' };
     mockConfig = defaultConfig;
-    mockGetState = jest.fn(() => mockState);
-    mockSetState = jest.fn();
+    mockGetState = vi.fn(() => mockState);
+    mockSetState = vi.fn();
   });
 
   test('1. should add event listeners on construction', () => {
-    const spy = jest.spyOn(mockElm, 'addEventListener');
+    const spy = vi.spyOn(mockElm, 'addEventListener');
     new AreaSelector({
       props: {
         elm: mockElm,
@@ -32,13 +33,13 @@ describe('Selector', () => {
     });
 
     expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
-    expect(spy).toHaveBeenCalledWith('mouseover', expect.any(Function));
-    expect(spy).toHaveBeenCalledWith('mouseout', expect.any(Function));
+    expect(spy).toHaveBeenCalledWith('pointerenter', expect.any(Function));
+    expect(spy).toHaveBeenCalledWith('pointerleave', expect.any(Function));
     expect(spy).toHaveBeenCalledTimes(3);
   });
 
   afterEach(() => {
     if (selector) selector.destroy();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 });
