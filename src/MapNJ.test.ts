@@ -107,6 +107,23 @@ describe('MapNJ v1 core', () => {
     expect(mapnj.getState().activeAreaId).toBe('red');
   });
 
+  test('pointerdownでoutlineが打ち消され、blurで復元されるべき (クリック時フォーカスリング対策)', () => {
+    buildFixture();
+    new MapNJ('#stage');
+    const red = document.getElementById('mapnj-area-red') as unknown as HTMLElement;
+
+    red.dispatchEvent(new Event('pointerdown'));
+    expect(red.style.outline).toBe('none');
+
+    // click 自体は通常どおり機能する (preventDefaultはしていない)
+    red.dispatchEvent(new Event('click'));
+    expect(red.getAttribute('aria-pressed')).toBe('true');
+
+    // キーボードフォーカスに備えて blur で復元される
+    red.dispatchEvent(new Event('blur'));
+    expect(red.style.outline).toBe('');
+  });
+
   test('ホバーでcontainerにdata-mapnj-hover-areaが付くべき', () => {
     const container = buildFixture();
     new MapNJ('#stage');

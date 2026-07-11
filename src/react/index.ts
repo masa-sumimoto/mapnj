@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import MapNJ from '../MapNJ';
 import type { MapNJOpts, MapNJState } from '../types';
@@ -30,8 +30,8 @@ export function useMapNJ<T extends HTMLElement = HTMLElement>(
   optionsRef.current = options;
 
   const instanceRef = useRef<MapNJ | null>(null);
-  const unsubscribeRef = useRef<(() => void) | null>(null);
 
+  const [node, setNode] = useState<T | null>(null);
   const [mapnj, setMapnj] = useState<MapNJ | null>(null);
   const [state, setState] = useState<MapNJState>({
     activeAreaId: options.activeAreaId || '',
@@ -39,25 +39,32 @@ export function useMapNJ<T extends HTMLElement = HTMLElement>(
     hoverAreaId: '',
   });
 
-  // callback ref: ノードの着脱に合わせてインスタンスを生成・破棄する
-  // (StrictModeの二重マウントでも安全)
-  const ref = useCallback((node: T | null) => {
-    if (instanceRef.current) {
-      unsubscribeRef.current?.();
-      unsubscribeRef.current = null;
-      instanceRef.current.destroy();
+  // ref自体はノードを覚えるだけの軽い存在にする
+  const ref = useCallback((n: T | null) => {
+    setNode(n);
+  }, []);
+
+  // インスタンスの生成・破棄はrefコールバックではなくeffectで行う。
+  // React 19ではrefコールバックがdangerouslySetInnerHTMLの反映より先に
+  // 発火することがあり (facebook/react#31600)、コンテナが空の時点で
+  // 初期化してしまう。effectはコミット完了後に走るため、この順序問題を
+  // 回避できる。クリーンアップがあるのでStrictModeの二重マウントでも安全
+  useEffect(() => {
+    if (!node) return;
+
+    const instance = new MapNJ(node, optionsRef.current);
+    instanceRef.current = instance;
+    const unsubscribe = instance.subscribe((s) => setState({ ...s }));
+    setState(instance.getState());
+    setMapnj(instance);
+
+    return () => {
+      unsubscribe();
+      instance.destroy();
       instanceRef.current = null;
       setMapnj(null);
-    }
-
-    if (node) {
-      const instance = new MapNJ(node, optionsRef.current);
-      instanceRef.current = instance;
-      unsubscribeRef.current = instance.subscribe((s) => setState({ ...s }));
-      setState(instance.getState());
-      setMapnj(instance);
-    }
-  }, []);
+    };
+  }, [node]);
 
   const selectArea = useCallback((areaId: string) => {
     instanceRef.current?.selectArea(areaId);

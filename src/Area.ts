@@ -22,8 +22,10 @@ export default class Area {
   private targetElmsInfo: TargetElmsInfo[];
   private clickHandler: (event: Event) => void;
   private keydownHandler: (event: Event) => void;
+  private pointerDownHandler: (event: Event) => void;
   private pointerEnterHandler: (event: Event) => void;
   private pointerLeaveHandler: (event: Event) => void;
+  private blurHandler: (event: Event) => void;
 
   constructor({ props }: { props: AreaProps }) {
     this.props = props;
@@ -68,13 +70,17 @@ export default class Area {
     // hover系は Pointer Events を使う (タッチ端末でのhover残留を防ぐため)
     this.clickHandler = this.handleClick.bind(this);
     this.keydownHandler = this.handleKeydown.bind(this);
+    this.pointerDownHandler = this.handlePointerDown.bind(this);
     this.pointerEnterHandler = this.handlePointerEnter.bind(this);
     this.pointerLeaveHandler = this.handlePointerLeave.bind(this);
+    this.blurHandler = this.handleBlur.bind(this);
 
     this.elm.addEventListener('click', this.clickHandler);
     this.elm.addEventListener('keydown', this.keydownHandler);
+    this.elm.addEventListener('pointerdown', this.pointerDownHandler);
     this.elm.addEventListener('pointerenter', this.pointerEnterHandler);
     this.elm.addEventListener('pointerleave', this.pointerLeaveHandler);
+    this.elm.addEventListener('blur', this.blurHandler);
 
     // style
     this.initStyle();
@@ -211,6 +217,19 @@ export default class Area {
     }
   }
 
+  private handlePointerDown(): void {
+    // クリック由来のフォーカスではリングを出さない (Chromium対策)。
+    // Chromiumはtabindex付きSVG要素だとマウスクリックでも:focus-visibleを
+    // 発火させてしまう。pointerdownのpreventDefault()はChromeでclick
+    // イベント自体を抑止してしまうため使えず、inline outlineで打ち消す。
+    // blur時に解除するので、キーボード(Tab)フォーカスのリングは無傷
+    (this.elm as HTMLElement).style.outline = 'none';
+  }
+
+  private handleBlur(): void {
+    (this.elm as HTMLElement).style.outline = '';
+  }
+
   private handlePointerEnter(e: Event): void {
     // タッチにhoverの概念は無い
     if ((e as PointerEvent).pointerType === 'touch') return;
@@ -227,7 +246,9 @@ export default class Area {
   public destroy(): void {
     this.elm.removeEventListener('click', this.clickHandler);
     this.elm.removeEventListener('keydown', this.keydownHandler);
+    this.elm.removeEventListener('pointerdown', this.pointerDownHandler);
     this.elm.removeEventListener('pointerenter', this.pointerEnterHandler);
     this.elm.removeEventListener('pointerleave', this.pointerLeaveHandler);
+    this.elm.removeEventListener('blur', this.blurHandler);
   }
 }

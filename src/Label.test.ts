@@ -42,9 +42,11 @@ describe('Label', () => {
     });
     expect(spy).toHaveBeenCalledWith('click', expect.any(Function));
     expect(spy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(spy).toHaveBeenCalledWith('pointerdown', expect.any(Function));
     expect(spy).toHaveBeenCalledWith('pointerenter', expect.any(Function));
     expect(spy).toHaveBeenCalledWith('pointerleave', expect.any(Function));
-    expect(spy).toHaveBeenCalledTimes(4);
+    expect(spy).toHaveBeenCalledWith('blur', expect.any(Function));
+    expect(spy).toHaveBeenCalledTimes(6);
   });
 
   test('2. should not add event listeners for noEventLabels', () => {
