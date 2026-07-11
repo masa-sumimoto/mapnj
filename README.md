@@ -1,7 +1,5 @@
 # MapNJ
 
-![MapNJ Screenshot](https://mapnj.masa-sumimoto.com/public/readme-hero.png)
-
 ![npm version](https://img.shields.io/npm/v/mapnj.svg?color=red)
 ![NPM Downloads](https://img.shields.io/npm/dt/mapnj.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
