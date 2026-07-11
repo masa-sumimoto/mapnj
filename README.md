@@ -126,6 +126,13 @@ function TouristMap() {
 
 The hook creates the instance when `ref` is attached, keeps `state` in sync with selection / hover, and destroys the instance on unmount (StrictMode-safe).
 
+> **React 19 + `dangerouslySetInnerHTML` warning:** React 19 re-applies `innerHTML` whenever the `{ __html }` object identity changes ([facebook/react#31660](https://github.com/facebook/react/issues/31660)). If you pass an inline object literal, every re-render wipes the initialized SVG. Hoist the object to module scope or memoize it:
+>
+> ```tsx
+> const MAP_HTML = { __html: mapSvg }; // module scope — stable identity
+> <div ref={ref} dangerouslySetInnerHTML={MAP_HTML} />
+> ```
+
 ## Programmatic API (vanilla)
 
 ```js
@@ -149,6 +156,15 @@ For detailed API documentation, please visit the [Advanced Usage](https://mapnj.
 This project is licensed under the MIT License. See the LICENSE file in the project root for full license information.
 
 # Changelog
+
+## [1.0.0-alpha.3] - 2026-07-11
+
+Fixes from alpha field testing.
+
+### Fixed
+
+- **React 19: `useMapNJ` initialized against an empty container.** React 19 can fire callback refs before `dangerouslySetInnerHTML` content is applied ([facebook/react#31600](https://github.com/react/react/issues/31600)), so the hook silently found zero areas. The instance is now created in an effect (after commit), which also keeps StrictMode safety.
+- **Focus ring flash on click (Chromium).** Chromium fires `:focus-visible` on mouse click for SVG elements with `tabindex`, so v1's keyboard support caused a default blue focus ring on every click. Areas and labels now neutralize the ring with an inline `outline: none` on `pointerdown` and restore it on `blur` — keyboard Tab focus rings are unaffected and `click` events fire normally. (Calling `preventDefault()` on `pointerdown` was rejected: Chrome suppresses the subsequent `click` event for mouse input.)
 
 ## [1.0.0-alpha.2] - 2026-07-11
 

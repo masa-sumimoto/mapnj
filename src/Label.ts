@@ -22,8 +22,10 @@ export default class Label {
   private targetElmsInfo: TargetElmsInfo[];
   private clickHandler?: (event: Event) => void;
   private keydownHandler?: (event: Event) => void;
+  private pointerDownHandler?: (event: Event) => void;
   private pointerEnterHandler?: (event: Event) => void;
   private pointerLeaveHandler?: (event: Event) => void;
+  private blurHandler?: (event: Event) => void;
 
   constructor({ props }: { props: LabelProps }) {
     this.elm = props.elm;
@@ -65,13 +67,17 @@ export default class Label {
     if (!this.isNoEventLabel()) {
       this.clickHandler = this.handleClick.bind(this);
       this.keydownHandler = this.handleKeydown.bind(this);
+      this.pointerDownHandler = this.handlePointerDown.bind(this);
       this.pointerEnterHandler = this.handlePointerEnter.bind(this);
       this.pointerLeaveHandler = this.handlePointerLeave.bind(this);
+      this.blurHandler = this.handleBlur.bind(this);
 
       this.elm.addEventListener('click', this.clickHandler);
       this.elm.addEventListener('keydown', this.keydownHandler);
+      this.elm.addEventListener('pointerdown', this.pointerDownHandler);
       this.elm.addEventListener('pointerenter', this.pointerEnterHandler);
       this.elm.addEventListener('pointerleave', this.pointerLeaveHandler);
+      this.elm.addEventListener('blur', this.blurHandler);
       (this.elm as HTMLElement).style.cursor = 'pointer';
 
       // a11y: クリック可能なラベルはキーボード操作可能なボタンとして振る舞う
@@ -248,6 +254,15 @@ export default class Label {
     }
   }
 
+  private handlePointerDown(): void {
+    // クリック由来のフォーカスではリングを出さない (Area と同じ理由)
+    (this.elm as HTMLElement).style.outline = 'none';
+  }
+
+  private handleBlur(): void {
+    (this.elm as HTMLElement).style.outline = '';
+  }
+
   private handlePointerEnter(e: Event): void {
     // タッチにhoverの概念は無い
     if ((e as PointerEvent).pointerType === 'touch') return;
@@ -265,8 +280,10 @@ export default class Label {
     if (!this.isNoEventLabel()) {
       this.elm.removeEventListener('click', this.clickHandler!);
       this.elm.removeEventListener('keydown', this.keydownHandler!);
+      this.elm.removeEventListener('pointerdown', this.pointerDownHandler!);
       this.elm.removeEventListener('pointerenter', this.pointerEnterHandler!);
       this.elm.removeEventListener('pointerleave', this.pointerLeaveHandler!);
+      this.elm.removeEventListener('blur', this.blurHandler!);
     }
   }
 }
