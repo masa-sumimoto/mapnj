@@ -1,4 +1,4 @@
-import { hasStroke, hasFill } from './Utils';
+import { hasStroke, hasFill, prefersReducedMotion } from './Utils';
 
 import { MapNJState, MapNJConfig, SetState } from './types';
 
@@ -20,9 +20,10 @@ export default class Area {
   public id: string;
   private elm: SVGElement | HTMLElement;
   private targetElmsInfo: TargetElmsInfo[];
-  private clickHandler: (event: MouseEvent) => void;
-  private mouseoverHandler: (event: MouseEvent) => void;
-  private mouseoutHandler: (event: MouseEvent) => void;
+  private clickHandler: (event: Event) => void;
+  private keydownHandler: (event: Event) => void;
+  private pointerEnterHandler: (event: Event) => void;
+  private pointerLeaveHandler: (event: Event) => void;
 
   constructor({ props }: { props: AreaProps }) {
     this.props = props;
@@ -58,20 +59,22 @@ export default class Area {
             },
           ];
 
-    // event
-    this.clickHandler = this.handleClick.bind(this);
-    this.mouseoverHandler = this.handleMouseOver.bind(this);
-    this.mouseoutHandler = this.handleMouseOut.bind(this);
+    // a11y: エリアはキーボード操作可能なトグルボタンとして振る舞う
+    this.elm.setAttribute('role', 'button');
+    this.elm.setAttribute('tabindex', '0');
+    this.elm.setAttribute('aria-pressed', 'false');
 
-    this.elm.addEventListener('click', this.clickHandler as EventListener);
-    this.elm.addEventListener(
-      'mouseover',
-      this.mouseoverHandler as EventListener,
-    );
-    this.elm.addEventListener(
-      'mouseout',
-      this.mouseoutHandler as EventListener,
-    );
+    // event
+    // hover系は Pointer Events を使う (タッチ端末でのhover残留を防ぐため)
+    this.clickHandler = this.handleClick.bind(this);
+    this.keydownHandler = this.handleKeydown.bind(this);
+    this.pointerEnterHandler = this.handlePointerEnter.bind(this);
+    this.pointerLeaveHandler = this.handlePointerLeave.bind(this);
+
+    this.elm.addEventListener('click', this.clickHandler);
+    this.elm.addEventListener('keydown', this.keydownHandler);
+    this.elm.addEventListener('pointerenter', this.pointerEnterHandler);
+    this.elm.addEventListener('pointerleave', this.pointerLeaveHandler);
 
     // style
     this.initStyle();
@@ -79,9 +82,12 @@ export default class Area {
 
   // init style
   private initStyle(): void {
-    const transitionSpeed = this.props.config.areaChangeSpeed;
     (this.elm as HTMLElement).style.cursor = 'pointer';
 
+    // reduced motion 指定時はtransitionを付与しない
+    if (prefersReducedMotion()) return;
+
+    const transitionSpeed = this.props.config.areaChangeSpeed;
     this.targetElmsInfo.forEach((info) => {
       (info.elm as HTMLElement).style.transition =
         `fill ${transitionSpeed}s ease, stroke ${transitionSpeed}s ease, opacity ${transitionSpeed}s ease`;
@@ -162,14 +168,22 @@ export default class Area {
     const isActiveView =
       this.id === state.activeAreaId || this.id === state.hoverAreaId;
 
+    // 状態をアクセシビリティとCSSフックの両方へ公開する
+    this.elm.setAttribute(
+      'aria-pressed',
+      String(this.id === state.activeAreaId),
+    );
+    this.elm.setAttribute(
+      'data-mapnj-state',
+      isActiveView ? 'active' : 'default',
+    );
+
     isActiveView ? this.activeView() : this.defaultView();
   }
 
   // event
   //
-  private handleClick(e: Event): void {
-    e.preventDefault();
-    const mouseEvent = e as MouseEvent;
+  private select(): void {
     const state = this.props.getState();
     const isClickSameArea = this.id === state.activeAreaId;
 
@@ -184,27 +198,36 @@ export default class Area {
     }
   }
 
-  private handleMouseOver(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handleClick(e: Event): void {
+    e.preventDefault();
+    this.select();
+  }
+
+  private handleKeydown(e: Event): void {
+    const key = (e as KeyboardEvent).key;
+    if (key === 'Enter' || key === ' ') {
+      e.preventDefault();
+      this.select();
+    }
+  }
+
+  private handlePointerEnter(e: Event): void {
+    // タッチにhoverの概念は無い
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: this.id }, ['AREA_MOUSEOVER']);
   }
 
-  private handleMouseOut(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handlePointerLeave(e: Event): void {
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: '' }, ['AREA_MOUSEOUT']);
   }
 
   // common
   //
   public destroy(): void {
-    this.elm.removeEventListener('click', this.clickHandler as EventListener);
-    this.elm.removeEventListener(
-      'mouseover',
-      this.mouseoverHandler as EventListener,
-    );
-    this.elm.removeEventListener(
-      'mouseout',
-      this.mouseoutHandler as EventListener,
-    );
+    this.elm.removeEventListener('click', this.clickHandler);
+    this.elm.removeEventListener('keydown', this.keydownHandler);
+    this.elm.removeEventListener('pointerenter', this.pointerEnterHandler);
+    this.elm.removeEventListener('pointerleave', this.pointerLeaveHandler);
   }
 }

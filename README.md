@@ -5,7 +5,7 @@
 ![npm version](https://img.shields.io/npm/v/mapnj.svg?color=red)
 ![NPM Downloads](https://img.shields.io/npm/dt/mapnj.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Jest](https://img.shields.io/badge/tested%20with-jest-99424f.svg)
+![Vitest](https://img.shields.io/badge/tested%20with-vitest-6E9F18.svg)
 
 [Official Web Site](https://mapnj.masa-sumimoto.com/)
 
@@ -110,6 +110,33 @@ For detailed API documentation, please visit the [Advanced Usage](https://mapnj.
 This project is licensed under the MIT License. See the LICENSE file in the project root for full license information.
 
 # Changelog
+
+## [1.0.0-alpha.1] - 2026-07-11
+
+v1 modernization (Phase 1). The library core has been brought up to 2026 standards.
+
+### Changed
+
+- **ESM-first packaging.** The package now ships ESM (`dist/index.js`), CJS (`dist/index.cjs`), and IIFE (`dist/MapNJ.min.js`) via an `exports` map. The CDN path `dist/MapNJ.min.js` is unchanged, so existing embeds keep working. The old `lib/` output is gone — import paths other than the package root are no longer supported.
+- **Hover now uses Pointer Events** (`pointerenter` / `pointerleave`). Touch input no longer triggers hover, which fixes the "sticky hover" problem on touch devices.
+- **Typed events.** `on()` only accepts valid action names (TypeScript) and now returns an unsubscribe function: `const off = mapnj.on('AREA_CLICK', cb); off();`
+- Build tooling: webpack + tsc → tsup. Tests: Jest → Vitest.
+
+### Added
+
+- **Keyboard accessibility.** Areas and clickable labels get `role="button"`, `tabindex="0"`, and respond to Enter / Space. The active area exposes `aria-pressed="true"`.
+- **CSS styling hooks.** The container now carries `data-mapnj-active-area` / `data-mapnj-hover-area`, and each area/label carries `data-mapnj-state="active|default"` — style states from your own CSS with attribute selectors, e.g. `[data-mapnj-active-area="tokyo"] .legend { ... }`.
+- **`prefers-reduced-motion` support.** Transitions and label entrance animations are skipped when the OS reduced-motion setting is on.
+
+### Fixed
+
+- `labelActiveFillColors` (per-label active fill) was reading from `labelActiveStrokeColors` due to a copy-paste bug.
+
+### Migration notes (0.x → 1.0)
+
+- Node >= 18 is required for development.
+- If you consumed `mapnj/lib/...` paths directly, switch to the package root import.
+- Hover callbacks (`AREA_MOUSEOVER` etc.) keep their names but fire from Pointer Events now; touch devices no longer emit them.
 
 ## [0.3.0] - 2025-03-18
 

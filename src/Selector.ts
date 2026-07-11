@@ -11,9 +11,9 @@ export default class AreaSelector {
   private props: SelectorProps;
   public areaId: string;
   private elm: SVGElement | HTMLElement;
-  private clickHandler: (event: MouseEvent) => void;
-  private mouseoverHandler: (event: MouseEvent) => void;
-  private mouseoutHandler: (event: MouseEvent) => void;
+  private clickHandler: (event: Event) => void;
+  private pointerEnterHandler: (event: Event) => void;
+  private pointerLeaveHandler: (event: Event) => void;
 
   constructor({ props }: { props: SelectorProps }) {
     this.elm = props.elm;
@@ -21,26 +21,20 @@ export default class AreaSelector {
     this.areaId = this.elm.dataset.areaId || '';
 
     // event
+    // hover系は Pointer Events を使う (タッチ端末でのhover残留を防ぐため)
     this.clickHandler = this.handleClick.bind(this);
-    this.mouseoverHandler = this.handleMouseOver.bind(this);
-    this.mouseoutHandler = this.handleMouseOut.bind(this);
+    this.pointerEnterHandler = this.handlePointerEnter.bind(this);
+    this.pointerLeaveHandler = this.handlePointerLeave.bind(this);
 
-    this.elm.addEventListener('click', this.clickHandler as EventListener);
-    this.elm.addEventListener(
-      'mouseover',
-      this.mouseoverHandler as EventListener,
-    );
-    this.elm.addEventListener(
-      'mouseout',
-      this.mouseoutHandler as EventListener,
-    );
+    this.elm.addEventListener('click', this.clickHandler);
+    this.elm.addEventListener('pointerenter', this.pointerEnterHandler);
+    this.elm.addEventListener('pointerleave', this.pointerLeaveHandler);
   }
 
   // event
   //
   private handleClick(e: Event): void {
     e.preventDefault();
-    const mouseEvent = e as MouseEvent;
     const state = this.props.getState();
 
     const isSelectSameArea = this.areaId === state.activeAreaId;
@@ -56,27 +50,22 @@ export default class AreaSelector {
     }
   }
 
-  private handleMouseOver(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handlePointerEnter(e: Event): void {
+    // タッチにhoverの概念は無い
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: this.areaId }, ['SELECTOR_MOUSEOVER']);
   }
 
-  private handleMouseOut(e: Event): void {
-    const mouseEvent = e as MouseEvent;
+  private handlePointerLeave(e: Event): void {
+    if ((e as PointerEvent).pointerType === 'touch') return;
     this.props.setState({ hoverAreaId: '' }, ['SELECTOR_MOUSEOUT']);
   }
 
   // common
   //
   public destroy(): void {
-    this.elm.removeEventListener('click', this.clickHandler as EventListener);
-    this.elm.removeEventListener(
-      'mouseover',
-      this.mouseoverHandler as EventListener,
-    );
-    this.elm.removeEventListener(
-      'mouseout',
-      this.mouseoutHandler as EventListener,
-    );
+    this.elm.removeEventListener('click', this.clickHandler);
+    this.elm.removeEventListener('pointerenter', this.pointerEnterHandler);
+    this.elm.removeEventListener('pointerleave', this.pointerLeaveHandler);
   }
 }

@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./lib",
-    "strict": true
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["vitest/globals"]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "**/*.spec.ts", "dist", "lib"]
+  "include": ["src", "tsup.config.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist", "lib"]
 }

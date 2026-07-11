@@ -28,3 +28,13 @@ export function hasFill(elm: SVGElement | HTMLElement): boolean {
   }
   return false;
 }
+
+// OSの「視差効果を減らす」設定を尊重する。
+// matchMedia が無い環境 (テスト等) では false を返す
+export function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}

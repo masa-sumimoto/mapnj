@@ -6,6 +6,7 @@ import Content from './Content';
 import Bg from './Bg';
 
 import {
+  Action,
   MapNJOpts,
   MapNJState,
   MapNJConfig,
@@ -333,9 +334,29 @@ class MapNJ {
         `--mapnj-hover-area_${this.state.hoverAreaId}`,
       );
     }
+
+    // CSSフック用のdata属性 (クラスより属性セレクタの方が扱いやすい)
+    // 例: [data-mapnj-active-area="tokyo"] .legend { ... }
+    if (this.state.activeAreaId) {
+      this.container.setAttribute(
+        'data-mapnj-active-area',
+        this.state.activeAreaId,
+      );
+    } else {
+      this.container.removeAttribute('data-mapnj-active-area');
+    }
+
+    if (this.state.hoverAreaId) {
+      this.container.setAttribute(
+        'data-mapnj-hover-area',
+        this.state.hoverAreaId,
+      );
+    } else {
+      this.container.removeAttribute('data-mapnj-hover-area');
+    }
   }
 
-  private render(actions?: string[]): void {
+  private render(actions?: Action[]): void {
     // 自身のデザインクラス管理
     this.updateDesignClasses();
 
@@ -364,22 +385,31 @@ class MapNJ {
 
   private setState = (
     newState: Partial<MapNJState>,
-    actions?: string[],
+    actions?: Action[],
   ): void => {
     this.state = { ...this.state, ...newState };
     this.render(actions);
   };
 
-  on(actionName: string, callback: EventCallback): void {
-    if (this.observers[actionName]) {
-      this.observers[actionName].push({
-        render: () => {
-          callback(this);
-        },
-      });
-    } else {
+  // イベント購読。解除用の関数を返す
+  // 例: const off = mapnj.on('AREA_CLICK', (m) => {...}); off();
+  on(actionName: Action, callback: EventCallback): () => void {
+    if (!this.observers[actionName]) {
       console.warn(`Event "${actionName}" is not supported.`);
+      return () => {};
     }
+
+    const observer = {
+      render: () => {
+        callback(this);
+      },
+    };
+    this.observers[actionName].push(observer);
+
+    return () => {
+      const index = this.observers[actionName].indexOf(observer);
+      if (index !== -1) this.observers[actionName].splice(index, 1);
+    };
   }
 }
 
