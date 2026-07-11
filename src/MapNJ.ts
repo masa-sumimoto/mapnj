@@ -4,6 +4,7 @@ import Selector from './Selector';
 import ResetSelector from './ResetSelector';
 import Content from './Content';
 import Bg from './Bg';
+import MapStore, { StateListener } from './core/store';
 
 import {
   Action,
@@ -22,7 +23,7 @@ class MapNJ {
   private container: HTMLElement;
   private config: MapNJConfig;
   private initialState: MapNJState;
-  private state: MapNJState;
+  private store: MapStore;
 
   private areas: Area[];
   private labels: Label[];
@@ -158,7 +159,11 @@ class MapNJ {
       activeAreaId: activeAreaId || '',
       hoverAreaId: '',
     };
-    this.state = { ...this.initialState };
+
+    // 状態はheadlessなストアが保持し、MapNJはDOMへの反映を担う
+    this.store = new MapStore(this.initialState, (actions) =>
+      this.render(actions),
+    );
 
     this.observers = {
       INIT: [],
@@ -183,13 +188,15 @@ class MapNJ {
     this.resetSelectors = [];
     this.contents = [];
 
+    const { getState, setState } = this.store;
+
     this.config.dom.areas.forEach((elm) => {
       const area = new Area({
         props: {
           elm: elm as SVGElement | HTMLElement,
           config: this.config,
-          getState: this.getState,
-          setState: this.setState,
+          getState,
+          setState,
         },
       });
       this.areas.push(area);
@@ -211,8 +218,8 @@ class MapNJ {
         props: {
           elm: elm as SVGElement | HTMLElement,
           config: this.config,
-          getState: this.getState,
-          setState: this.setState,
+          getState,
+          setState,
         },
       });
       this.labels.push(label);
@@ -235,8 +242,8 @@ class MapNJ {
           props: {
             elm: elm as HTMLElement,
             config: this.config,
-            getState: this.getState,
-            setState: this.setState,
+            getState,
+            setState,
           },
         }),
       );
@@ -248,8 +255,8 @@ class MapNJ {
           props: {
             elm: elm as HTMLElement,
             config: this.config,
-            getState: this.getState,
-            setState: this.setState,
+            getState,
+            setState,
           },
         }),
       );
@@ -260,7 +267,7 @@ class MapNJ {
         props: {
           elm: elm as HTMLElement,
           config: this.config,
-          getState: this.getState,
+          getState,
         },
       });
       this.contents.push(content);
@@ -275,7 +282,7 @@ class MapNJ {
       this.bg = new Bg({
         props: {
           config: this.config,
-          getState: this.getState,
+          getState,
         },
       });
       this.observers.INIT.push(this.bg);
@@ -292,7 +299,7 @@ class MapNJ {
 
     // init
     // [note] INITのみアプリ内部で使うオブザーバー
-    this.setState({}, ['INIT']);
+    this.store.setState({}, ['INIT']);
   }
 
   private initDom(attributeType: string, separator: string): DomElements {
@@ -317,40 +324,37 @@ class MapNJ {
   }
 
   private updateDesignClasses() {
+    const state = this.store.getState();
+
     // mapnjデザインクラス群の総削除と状態に対応したクラスの付加
     removeClassesWithCommonPrefix(this.container as HTMLElement, '--mapnj-');
 
-    if (this.state.activeAreaId) {
+    if (state.activeAreaId) {
       this.container.classList.add(
-        `--mapnj-active-area_${this.state.activeAreaId}`,
+        `--mapnj-active-area_${state.activeAreaId}`,
         '--mapnj-is-active-area_true',
       );
     } else {
       this.container.classList.add('--mapnj-is-active-area_false');
     }
 
-    if (this.state.hoverAreaId) {
-      this.container.classList.add(
-        `--mapnj-hover-area_${this.state.hoverAreaId}`,
-      );
+    if (state.hoverAreaId) {
+      this.container.classList.add(`--mapnj-hover-area_${state.hoverAreaId}`);
     }
 
     // CSSフック用のdata属性 (クラスより属性セレクタの方が扱いやすい)
     // 例: [data-mapnj-active-area="tokyo"] .legend { ... }
-    if (this.state.activeAreaId) {
+    if (state.activeAreaId) {
       this.container.setAttribute(
         'data-mapnj-active-area',
-        this.state.activeAreaId,
+        state.activeAreaId,
       );
     } else {
       this.container.removeAttribute('data-mapnj-active-area');
     }
 
-    if (this.state.hoverAreaId) {
-      this.container.setAttribute(
-        'data-mapnj-hover-area',
-        this.state.hoverAreaId,
-      );
+    if (state.hoverAreaId) {
+      this.container.setAttribute('data-mapnj-hover-area', state.hoverAreaId);
     } else {
       this.container.removeAttribute('data-mapnj-hover-area');
     }
@@ -376,20 +380,60 @@ class MapNJ {
     this.labels = [];
     this.selectors = [];
     this.resetSelectors = [];
-    this.state = { ...this.initialState };
+    this.store.clearSubscribers();
+    this.store.reset(this.initialState);
   }
 
-  private getState = (): MapNJState => {
-    return this.state;
-  };
+  // --- public state API ---
+  //
 
-  private setState = (
-    newState: Partial<MapNJState>,
-    actions?: Action[],
-  ): void => {
-    this.state = { ...this.state, ...newState };
-    this.render(actions);
-  };
+  get activeAreaId(): string {
+    return this.store.getState().activeAreaId;
+  }
+
+  get hoverAreaId(): string {
+    return this.store.getState().hoverAreaId;
+  }
+
+  get prevActiveAreaId(): string {
+    return this.store.getState().prevActiveAreaId;
+  }
+
+  // 現在の状態のスナップショットを返す
+  getState(): MapNJState {
+    return { ...this.store.getState() };
+  }
+
+  // アクション種別を問わない状態変化の購読。解除関数を返す
+  subscribe(listener: StateListener): () => void {
+    return this.store.subscribe(listener);
+  }
+
+  // プログラムからのエリア選択。外部Selectorのクリックと同じ扱いで通知される
+  selectArea(areaId: string): void {
+    const state = this.store.getState();
+    if (areaId === state.activeAreaId) {
+      this.store.setState({}, ['SELECTOR_CLICK']);
+    } else {
+      this.store.setState(
+        { activeAreaId: areaId, prevActiveAreaId: state.activeAreaId },
+        ['SELECTOR_CLICK', 'AREA_CHANGE'],
+      );
+    }
+  }
+
+  // 選択解除。ResetSelectorのクリックと同じ扱いで通知される
+  reset(): void {
+    const state = this.store.getState();
+    if (state.activeAreaId === '') {
+      this.store.setState({}, ['RESET_SELECTOR_CLICK']);
+    } else {
+      this.store.setState(
+        { activeAreaId: '', prevActiveAreaId: state.activeAreaId },
+        ['RESET_SELECTOR_CLICK', 'AREA_CHANGE'],
+      );
+    }
+  }
 
   // イベント購読。解除用の関数を返す
   // 例: const off = mapnj.on('AREA_CLICK', (m) => {...}); off();

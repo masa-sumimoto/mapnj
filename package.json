@@ -1,6 +1,6 @@
 {
   "name": "mapnj",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "A script to add interactivity (such as click events) to SVG-based illustration maps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -14,6 +14,19 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
     }
   },
   "sideEffects": false,
@@ -52,7 +65,10 @@
   },
   "homepage": "https://github.com/masa-sumimoto/mapnj#readme",
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^20.14.10",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.57.0",
@@ -60,6 +76,8 @@
     "eslint-plugin-prettier": "^5.1.3",
     "jsdom": "^29.1.1",
     "prettier": "^3.3.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "tsup": "^8.5.1",
     "typescript": "^5.5.3",
     "vitest": "^4.1.10"

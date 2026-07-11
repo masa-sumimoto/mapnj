@@ -74,6 +74,39 @@ describe('MapNJ v1 core', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
+  test('selectArea()/reset() で外部から操作でき、subscribe() が発火するべき', () => {
+    const container = buildFixture();
+    const mapnj = new MapNJ('#stage');
+    const listener = vi.fn();
+    const off = mapnj.subscribe(listener);
+
+    mapnj.selectArea('red');
+    expect(mapnj.activeAreaId).toBe('red');
+    expect(container.getAttribute('data-mapnj-active-area')).toBe('red');
+    expect(listener).toHaveBeenCalledWith(
+      expect.objectContaining({ activeAreaId: 'red' }),
+    );
+
+    mapnj.reset();
+    expect(mapnj.activeAreaId).toBe('');
+    expect(mapnj.prevActiveAreaId).toBe('red');
+    expect(container.getAttribute('data-mapnj-active-area')).toBeNull();
+
+    off();
+    const callCount = listener.mock.calls.length;
+    mapnj.selectArea('blue');
+    expect(listener).toHaveBeenCalledTimes(callCount);
+  });
+
+  test('getState() はスナップショットを返すべき (内部状態と別オブジェクト)', () => {
+    buildFixture();
+    const mapnj = new MapNJ('#stage');
+    const snapshot = mapnj.getState();
+    mapnj.selectArea('red');
+    expect(snapshot.activeAreaId).toBe('');
+    expect(mapnj.getState().activeAreaId).toBe('red');
+  });
+
   test('ホバーでcontainerにdata-mapnj-hover-areaが付くべき', () => {
     const container = buildFixture();
     new MapNJ('#stage');
