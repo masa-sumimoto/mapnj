@@ -58,7 +58,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/masa-sumimoto/mapnj.git"
+    "url": "git+https://github.com/masa-sumimoto/mapnj.git"
   },
   "bugs": {
     "url": "https://github.com/masa-sumimoto/mapnj/issues"
