@@ -1,3 +1,5 @@
+![MapNJ — JavaScript / Node Module for Design. A script that adds small interactions to illustrations created with SVG.](https://raw.githubusercontent.com/masa-sumimoto/mapnj/main/assets/readme-hero.png)
+
 # MapNJ
 
 ![npm version](https://img.shields.io/npm/v/mapnj.svg?color=red)
@@ -154,6 +156,14 @@ For detailed API documentation, please visit the [Advanced Usage](https://mapnj.
 This project is licensed under the MIT License. See the LICENSE file in the project root for full license information.
 
 # Changelog
+
+## [1.0.0] - 2026-07-12
+
+First stable release of the v1 line — identical in code to 1.0.0-alpha.3, promoted to `latest`. See the alpha entries below for everything that changed since 0.3.0.
+
+### Added
+
+- New README hero image.
 
 ## [1.0.0-alpha.3] - 2026-07-11
 
